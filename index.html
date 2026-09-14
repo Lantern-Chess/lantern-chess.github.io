@@ -1,26 +1,2965 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Lantern Chess Engine</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Lantern Chess Engine</title>
+
+<meta
+    name="description"
+    content="Lantern is a modern independent UCI chess engine built for speed, strength and competitive chess."
+>
+
+<style>
+
+    /* =========================================================
+       GLOBAL
+       ========================================================= */
+
+    :root {
+        --orange: #ff9d22;
+        --orange-light: #ffc56d;
+        --orange-pale: #ffe0ad;
+        --orange-dark: #d97800;
+
+        --cream: #fffaf3;
+        --cream-dark: #fff1dc;
+
+        --dark: #17120d;
+        --dark2: #211910;
+        --dark3: #302418;
+
+        --text: #2b2118;
+        --muted: #786959;
+
+        --white: #ffffff;
+
+        --shadow:
+            0 20px 60px rgba(105, 58, 0, 0.13);
+    }
+
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+
+    body {
+        font-family:
+            "Segoe UI",
+            Arial,
+            Helvetica,
+            sans-serif;
+
+        background:
+            linear-gradient(
+                180deg,
+                #fff8ef,
+                #fffdf9
+            );
+
+        color: var(--text);
+
+        line-height: 1.6;
+
+        overflow-x: hidden;
+    }
+
+
+    a {
+        text-decoration: none;
+    }
+
+
+    button,
+    a {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+
+    .container {
+        width: min(1180px, 90%);
+        margin: auto;
+    }
+
+
+    /* =========================================================
+       NAVIGATION
+       ========================================================= */
+
+    nav {
+        position: fixed;
+
+        top: 0;
+        left: 0;
+
+        width: 100%;
+
+        height: 78px;
+
+        background:
+            rgba(255, 250, 243, 0.86);
+
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+
+        border-bottom:
+            1px solid rgba(180, 120, 50, 0.12);
+
+        z-index: 1000;
+    }
+
+
+    .nav-inner {
+        height: 100%;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+
+    .nav-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        color: var(--dark);
+
+        font-weight: 800;
+        font-size: 21px;
+    }
+
+
+    /* SMALL LANTERN LOGO */
+
+    .mini-logo {
+        width: 43px;
+        height: 43px;
+
+        border-radius: 12px;
+
+        background:
+            linear-gradient(
+                145deg,
+                #ffc76f,
+                #ffa22c
+            );
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        box-shadow:
+            0 7px 20px rgba(255, 145, 0, 0.25);
+    }
+
+
+    .mini-logo svg {
+        width: 29px;
+        height: 29px;
+    }
+
+
+    .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+
+    .nav-links a {
+        color: #5f5143;
+
+        font-size: 15px;
+        font-weight: 600;
+
+        transition: 0.2s;
+    }
+
+
+    .nav-links a:hover {
+        color: var(--orange-dark);
+    }
+
+
+    .nav-download {
+        padding: 11px 20px;
+
+        border-radius: 10px;
+
+        color: white !important;
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffad35,
+                #ee8200
+            );
+
+        box-shadow:
+            0 7px 20px rgba(235, 125, 0, 0.2);
+
+        transition: 0.2s !important;
+    }
+
+
+    .nav-download:hover {
+        transform: translateY(-2px);
+    }
+
+
+    .mobile-menu {
+        display: none;
+
+        font-size: 28px;
+
+        background: none;
+        border: none;
+
+        cursor: pointer;
+    }
+
+
+
+    /* =========================================================
+       HERO
+       ========================================================= */
+
+    .hero {
+        min-height: 100vh;
+
+        display: flex;
+        align-items: center;
+
+        position: relative;
+
+        padding-top: 110px;
+
+        overflow: hidden;
+    }
+
+
+    .hero::before {
+        content: "";
+
+        position: absolute;
+
+        width: 620px;
+        height: 620px;
+
+        border-radius: 50%;
+
+        right: -220px;
+        top: 90px;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(255, 176, 67, 0.25),
+                rgba(255, 176, 67, 0.03) 60%,
+                transparent 75%
+            );
+    }
+
+
+    .hero-grid {
+        display: grid;
+
+        grid-template-columns:
+            1.15fr 0.85fr;
+
+        gap: 80px;
+
+        align-items: center;
+    }
+
+
+    .eyebrow {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 8px 14px;
+
+        border-radius: 50px;
+
+        background: #fff0d6;
+
+        border:
+            1px solid #ffd39a;
+
+        color: #b86100;
+
+        font-weight: 700;
+        font-size: 13px;
+
+        margin-bottom: 25px;
+    }
+
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+
+        border-radius: 50%;
+
+        background: #ff940d;
+
+        box-shadow:
+            0 0 10px #ff940d;
+    }
+
+
+    .hero h1 {
+        font-size:
+            clamp(65px, 9vw, 120px);
+
+        line-height: 0.9;
+
+        letter-spacing: -5px;
+
+        color: var(--dark);
+
+        margin-bottom: 22px;
+    }
+
+
+    .hero h1 span {
+        color: var(--orange-dark);
+    }
+
+
+    .hero-subtitle {
+        font-size:
+            clamp(20px, 2.4vw, 29px);
+
+        font-weight: 600;
+
+        color: #594b3d;
+
+        margin-bottom: 20px;
+    }
+
+
+    .hero-description {
+        max-width: 640px;
+
+        color: var(--muted);
+
+        font-size: 17px;
+
+        line-height: 1.8;
+
+        margin-bottom: 35px;
+    }
+
+
+    .hero-buttons {
+        display: flex;
+
+        gap: 14px;
+
+        flex-wrap: wrap;
+    }
+
+
+    .btn {
+        display: inline-flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 10px;
+
+        padding: 15px 24px;
+
+        border-radius: 11px;
+
+        font-size: 15px;
+        font-weight: 750;
+
+        transition: 0.22s;
+
+        cursor: pointer;
+    }
+
+
+    .btn-primary {
+        color: #fff;
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffae35,
+                #e97c00
+            );
+
+        box-shadow:
+            0 12px 28px
+            rgba(225, 119, 0, 0.25);
+    }
+
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+
+        box-shadow:
+            0 16px 35px
+            rgba(225, 119, 0, 0.33);
+    }
+
+
+    .btn-secondary {
+        color: #49392b;
+
+        background: white;
+
+        border:
+            1px solid #eadbc9;
+    }
+
+
+    .btn-secondary:hover {
+        transform: translateY(-3px);
+
+        border-color: #f1ad50;
+    }
+
+
+
+    /* =========================================================
+       LARGE LOGO
+       ========================================================= */
+
+    .logo-stage {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        position: relative;
+    }
+
+
+    .logo-glow {
+        position: absolute;
+
+        width: 420px;
+        height: 420px;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(255, 150, 20, 0.35),
+                transparent 67%
+            );
+
+        filter: blur(20px);
+
+        animation:
+            glowPulse 3s ease-in-out infinite;
+    }
+
+
+    @keyframes glowPulse {
+
+        0%,
+        100% {
+            transform: scale(0.93);
+            opacity: 0.55;
+        }
+
+        50% {
+            transform: scale(1.07);
+            opacity: 0.9;
+        }
+    }
+
+
+    .big-logo {
+        width:
+            clamp(250px, 28vw, 365px);
+
+        aspect-ratio: 1;
+
+        position: relative;
+
+        border-radius: 70px;
+
+        background:
+            linear-gradient(
+                145deg,
+                #ffd48c,
+                #ffad3a
+            );
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        box-shadow:
+            0 35px 80px rgba(173, 89, 0, 0.22),
+            inset 0 1px 1px rgba(255,255,255,0.7);
+
+        border:
+            1px solid rgba(255, 255, 255, 0.65);
+
+        animation:
+            floatLogo 5s ease-in-out infinite;
+    }
+
+
+    @keyframes floatLogo {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-14px);
+        }
+    }
+
+
+    .big-logo svg {
+        width: 68%;
+        height: 68%;
+
+        filter:
+            drop-shadow(
+                0 12px 15px
+                rgba(128, 58, 0, 0.22)
+            );
+    }
+
+
+
+    /* =========================================================
+       STATS STRIP
+       ========================================================= */
+
+    .stats {
+        margin-top: -15px;
+        position: relative;
+
+        z-index: 5;
+    }
+
+
+    .stats-card {
+        background: white;
+
+        border:
+            1px solid #f0dfcc;
+
+        border-radius: 20px;
+
+        padding: 29px;
+
+        box-shadow: var(--shadow);
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(4, 1fr);
+    }
+
+
+    .stat {
+        text-align: center;
+
+        border-right:
+            1px solid #f0e6da;
+    }
+
+
+    .stat:last-child {
+        border-right: none;
+    }
+
+
+    .stat strong {
+        display: block;
+
+        font-size: 25px;
+
+        color: var(--dark);
+    }
+
+
+    .stat span {
+        font-size: 13px;
+
+        color: #918171;
+
+        font-weight: 600;
+    }
+
+
+
+    /* =========================================================
+       GENERAL SECTIONS
+       ========================================================= */
+
+    section {
+        padding: 115px 0;
+    }
+
+
+    .section-header {
+        text-align: center;
+
+        max-width: 700px;
+
+        margin:
+            0 auto 55px;
+    }
+
+
+    .section-tag {
+        color: #d27600;
+
+        font-size: 13px;
+        font-weight: 800;
+
+        letter-spacing: 2px;
+
+        text-transform: uppercase;
+
+        margin-bottom: 10px;
+    }
+
+
+    .section-header h2 {
+        font-size:
+            clamp(34px, 5vw, 52px);
+
+        color: var(--dark);
+
+        margin-bottom: 14px;
+    }
+
+
+    .section-header p {
+        color: var(--muted);
+
+        font-size: 16px;
+    }
+
+
+
+    /* =========================================================
+       FEATURES
+       ========================================================= */
+
+    .features {
+        background:
+            linear-gradient(
+                180deg,
+                transparent,
+                #fff3e3,
+                transparent
+            );
+    }
+
+
+    .feature-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 22px;
+    }
+
+
+    .feature-card {
+        background:
+            rgba(255,255,255,0.85);
+
+        border:
+            1px solid #eadbc9;
+
+        border-radius: 18px;
+
+        padding: 32px;
+
+        transition: 0.25s;
+    }
+
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+
+        border-color: #f6b258;
+
+        box-shadow:
+            0 20px 40px
+            rgba(110, 60, 0, 0.08);
+    }
+
+
+    .feature-icon {
+        width: 50px;
+        height: 50px;
+
+        border-radius: 13px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background:
+            linear-gradient(
+                145deg,
+                #ffe1b2,
+                #ffc064
+            );
+
+        color: #8f4d00;
+
+        font-size: 24px;
+
+        margin-bottom: 21px;
+    }
+
+
+    .feature-card h3 {
+        color: var(--dark);
+
+        margin-bottom: 10px;
+
+        font-size: 20px;
+    }
+
+
+    .feature-card p {
+        color: var(--muted);
+
+        font-size: 14px;
+
+        line-height: 1.75;
+    }
+
+
+
+    /* =========================================================
+       DOWNLOAD
+       ========================================================= */
+
+    #download {
+        padding-top: 90px;
+    }
+
+
+    .download-box {
+        position: relative;
+
+        overflow: hidden;
+
+        border-radius: 28px;
+
+        padding:
+            70px clamp(28px, 6vw, 70px);
+
+        background:
+            linear-gradient(
+                145deg,
+                #22170c,
+                #100c08
+            );
+
+        color: white;
+
+        box-shadow:
+            0 35px 80px
+            rgba(32, 18, 3, 0.22);
+    }
+
+
+    .download-box::before {
+        content: "";
+
+        position: absolute;
+
+        width: 500px;
+        height: 500px;
+
+        right: -180px;
+        top: -170px;
+
+        border-radius: 50%;
+
+        background:
+            radial-gradient(
+                circle,
+                rgba(255, 157, 34, 0.38),
+                transparent 65%
+            );
+    }
+
+
+    .download-content {
+        position: relative;
+        z-index: 2;
+
+        display: grid;
+
+        grid-template-columns:
+            1.2fr 0.8fr;
+
+        gap: 50px;
+
+        align-items: center;
+    }
+
+
+    .download-tag {
+        color: #ffc46f;
+
+        font-weight: 700;
+
+        margin-bottom: 10px;
+    }
+
+
+    .download-box h2 {
+        font-size:
+            clamp(38px, 5vw, 58px);
+
+        line-height: 1.05;
+
+        margin-bottom: 20px;
+    }
+
+
+    .download-description {
+        color: #c8b7a2;
+
+        max-width: 600px;
+
+        margin-bottom: 28px;
+
+        font-size: 15px;
+    }
+
+
+    .download-meta {
+        display: flex;
+        flex-wrap: wrap;
+
+        gap: 10px;
+
+        margin-bottom: 29px;
+    }
+
+
+    .download-meta span {
+        padding: 7px 12px;
+
+        border-radius: 7px;
+
+        background:
+            rgba(255,255,255,0.07);
+
+        border:
+            1px solid
+            rgba(255,255,255,0.08);
+
+        color: #ddccba;
+
+        font-size: 12px;
+    }
+
+
+    .big-download {
+        padding: 16px 27px;
+    }
+
+
+    .release-card {
+        background:
+            rgba(255,255,255,0.07);
+
+        border:
+            1px solid
+            rgba(255,255,255,0.1);
+
+        border-radius: 18px;
+
+        padding: 28px;
+
+        backdrop-filter: blur(10px);
+    }
+
+
+    .release-card h3 {
+        color: #ffbd5e;
+
+        margin-bottom: 18px;
+    }
+
+
+    .release-row {
+        display: flex;
+
+        justify-content: space-between;
+
+        padding: 10px 0;
+
+        border-bottom:
+            1px solid
+            rgba(255,255,255,0.08);
+
+        color: #cbbbaa;
+
+        font-size: 14px;
+    }
+
+
+    .release-row:last-child {
+        border-bottom: none;
+    }
+
+
+    .release-row strong {
+        color: white;
+    }
+
+
+
+    /* =========================================================
+       INSTALLATION
+       ========================================================= */
+
+    .steps {
+        display: grid;
+
+        grid-template-columns:
+            repeat(4, 1fr);
+
+        gap: 18px;
+    }
+
+
+    .step {
+        position: relative;
+
+        background: white;
+
+        border:
+            1px solid #eadbc9;
+
+        border-radius: 16px;
+
+        padding: 28px;
+    }
+
+
+    .step-number {
+        width: 38px;
+        height: 38px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background:
+            #ffb34b;
+
+        color: #442400;
+
+        font-weight: 900;
+
+        margin-bottom: 20px;
+    }
+
+
+    .step h3 {
+        margin-bottom: 8px;
+
+        font-size: 17px;
+    }
+
+
+    .step p {
+        color: var(--muted);
+
+        font-size: 14px;
+    }
+
+
+
+    /* =========================================================
+       ENGINE INFO
+       ========================================================= */
+
+    .engine-info {
+        background: #fff3e4;
+    }
+
+
+    .info-grid {
+        max-width: 850px;
+
+        margin: auto;
+
+        background: white;
+
+        border:
+            1px solid #ecd8c1;
+
+        border-radius: 18px;
+
+        overflow: hidden;
+
+        box-shadow: var(--shadow);
+    }
+
+
+    .info-row {
+        display: grid;
+
+        grid-template-columns:
+            1fr 1.8fr;
+
+        padding: 17px 26px;
+
+        border-bottom:
+            1px solid #f0e5d9;
+    }
+
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+
+    .info-row span:first-child {
+        font-weight: 750;
+
+        color: #5a4836;
+    }
+
+
+    .info-row span:last-child {
+        color: #8b7865;
+    }
+
+
+
+    /* =========================================================
+       FAQ
+       ========================================================= */
+
+    .faq {
+        max-width: 850px;
+
+        margin: auto;
+    }
+
+
+    .faq-item {
+        background: white;
+
+        border:
+            1px solid #eadbc9;
+
+        border-radius: 13px;
+
+        margin-bottom: 12px;
+
+        overflow: hidden;
+    }
+
+
+    .faq-question {
+        width: 100%;
+
+        border: none;
+
+        background: none;
+
+        padding: 20px 22px;
+
+        display: flex;
+
+        justify-content: space-between;
+
+        align-items: center;
+
+        cursor: pointer;
+
+        text-align: left;
+
+        font-size: 15px;
+        font-weight: 700;
+
+        color: #392c20;
+    }
+
+
+    .faq-answer {
+        max-height: 0;
+
+        overflow: hidden;
+
+        transition:
+            max-height 0.3s ease;
+
+        color: var(--muted);
+    }
+
+
+    .faq-answer p {
+        padding:
+            0 22px 21px;
+    }
+
+
+    .faq-item.open
+    .faq-answer {
+        max-height: 220px;
+    }
+
+
+    .faq-plus {
+        font-size: 22px;
+
+        transition:
+            transform 0.25s;
+    }
+
+
+    .faq-item.open
+    .faq-plus {
+        transform: rotate(45deg);
+    }
+
+
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+
+    footer {
+        background: #130e09;
+
+        color: #ac9a87;
+
+        padding: 65px 0 35px;
+    }
+
+
+    .footer-top {
+        display: flex;
+
+        justify-content: space-between;
+        align-items: flex-start;
+
+        gap: 40px;
+
+        padding-bottom: 45px;
+
+        border-bottom:
+            1px solid rgba(255,255,255,0.08);
+    }
+
+
+    .footer-brand {
+        max-width: 420px;
+    }
+
+
+    .footer-title {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        color: white;
+
+        font-size: 22px;
+        font-weight: 800;
+
+        margin-bottom: 16px;
+    }
+
+
+    .footer-brand p {
+        font-size: 14px;
+
+        line-height: 1.8;
+    }
+
+
+    .footer-links {
+        display: flex;
+
+        gap: 20px;
+
+        flex-wrap: wrap;
+    }
+
+
+    .footer-links a {
+        color: #bdab99;
+
+        transition: 0.2s;
+    }
+
+
+    .footer-links a:hover {
+        color: #ffb14a;
+    }
+
+
+    .copyright {
+        margin-top: 30px;
+
+        text-align: center;
+
+        font-size: 12px;
+
+        color: #76695c;
+    }
+
+
+
+    /* =========================================================
+       SCROLL ANIMATIONS
+       ========================================================= */
+
+    .reveal {
+        opacity: 0;
+
+        transform:
+            translateY(35px);
+
+        transition:
+            0.7s ease;
+    }
+
+
+    .reveal.visible {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+        .hero-grid {
+            grid-template-columns: 1fr;
+
+            text-align: center;
+
+            gap: 35px;
+        }
+
+
+        .hero-description {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+        .hero-buttons {
+            justify-content: center;
+        }
+
+
+        .logo-stage {
+            order: -1;
+        }
+
+
+        .big-logo {
+            width: 245px;
+
+            border-radius: 50px;
+        }
+
+
+        .stats-card {
+            grid-template-columns:
+                repeat(2, 1fr);
+
+            gap: 25px;
+        }
+
+
+        .stat {
+            border-right: none;
+        }
+
+
+        .feature-grid {
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+
+        .steps {
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+
+        .download-content {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+
+    @media (max-width: 700px) {
+
+        nav {
+            height: 70px;
+        }
+
+
+        .mobile-menu {
+            display: block;
+        }
+
+
+        .nav-links {
+            position: absolute;
+
+            top: 70px;
+            left: 0;
+
+            width: 100%;
+
+            display: none;
+            flex-direction: column;
+
+            padding: 25px;
+
+            background: #fffaf3;
+
+            border-bottom:
+                1px solid #eadbc9;
+        }
+
+
+        .nav-links.open {
+            display: flex;
+        }
+
+
+        .hero {
+            padding-top: 110px;
+        }
+
+
+        .hero h1 {
+            letter-spacing: -3px;
+        }
+
+
+        .stats-card {
+            grid-template-columns: 1fr;
+        }
+
+
+        .feature-grid,
+        .steps {
+            grid-template-columns: 1fr;
+        }
+
+
+        .info-row {
+            grid-template-columns: 1fr;
+
+            gap: 4px;
+        }
+
+
+        section {
+            padding: 85px 0;
+        }
+
+
+        .footer-top {
+            flex-direction: column;
+        }
+
+    }
+
+</style>
 </head>
 
-<body style="
-    background:#0b0b0b;
-    color:white;
-    font-family:Arial;
-    text-align:center;
-    padding-top:120px;
-">
 
-    <h1 style="font-size:70px;color:#ffb22e;">
-        🏮 LANTERN
-    </h1>
 
-    <h2>Chess Engine</h2>
+<body>
 
-    <p>
-        The official home of the Lantern Chess Engine.
-    </p>
+
+<!-- =========================================================
+     NAVIGATION
+     ========================================================= -->
+
+<nav>
+
+    <div class="container nav-inner">
+
+        <a class="nav-brand" href="#home">
+
+            <div class="mini-logo">
+
+                <!-- LANTERN SVG -->
+                <svg
+                    viewBox="0 0 100 100"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+
+                    <defs>
+
+                        <radialGradient id="miniGlow">
+
+                            <stop
+                                offset="0%"
+                                stop-color="#fff8a5"
+                            />
+
+                            <stop
+                                offset="45%"
+                                stop-color="#ffd43b"
+                            />
+
+                            <stop
+                                offset="100%"
+                                stop-color="#ff8c00"
+                            />
+
+                        </radialGradient>
+
+                    </defs>
+
+
+                    <path
+                        d="M38 18
+                           C38 7 62 7 62 18"
+                        fill="none"
+                        stroke="#502900"
+                        stroke-width="6"
+                        stroke-linecap="round"
+                    />
+
+
+                    <rect
+                        x="34"
+                        y="20"
+                        width="32"
+                        height="8"
+                        rx="3"
+                        fill="#5a2c00"
+                    />
+
+
+                    <path
+                        d="
+                        M30 32
+                        Q50 24 70 32
+                        L64 72
+                        Q50 80 36 72
+                        Z"
+                        fill="url(#miniGlow)"
+                        stroke="#7b3b00"
+                        stroke-width="5"
+                    />
+
+
+                    <circle
+                        cx="50"
+                        cy="52"
+                        r="14"
+                        fill="#fff8bd"
+                        opacity="0.8"
+                    />
+
+
+                    <rect
+                        x="30"
+                        y="73"
+                        width="40"
+                        height="9"
+                        rx="4"
+                        fill="#562900"
+                    />
+
+                </svg>
+
+            </div>
+
+            Lantern
+
+        </a>
+
+
+        <button
+            class="mobile-menu"
+            id="mobileMenu"
+            aria-label="Open navigation"
+        >
+            ☰
+        </button>
+
+
+        <div
+            class="nav-links"
+            id="navLinks"
+        >
+
+            <a href="#features">
+                Features
+            </a>
+
+            <a href="#download">
+                Download
+            </a>
+
+            <a href="#install">
+                Install
+            </a>
+
+            <a href="#engine">
+                Engine
+            </a>
+
+            <a href="#faq">
+                FAQ
+            </a>
+
+            <a
+                href="https://github.com/Lantern-Chess"
+                target="_blank"
+            >
+                GitHub
+            </a>
+
+            <a
+                class="nav-download"
+                href="#download"
+            >
+                Download
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<!-- =========================================================
+     HERO
+     ========================================================= -->
+
+<header
+    class="hero"
+    id="home"
+>
+
+    <div class="container hero-grid">
+
+
+        <!-- TEXT -->
+
+        <div>
+
+            <div class="eyebrow">
+
+                <span class="status-dot"></span>
+
+                Independent Chess Engine
+
+            </div>
+
+
+            <h1>
+                LANT<span>ERN</span>
+            </h1>
+
+
+            <div class="hero-subtitle">
+
+                Illuminate the board.
+
+            </div>
+
+
+            <p class="hero-description">
+
+                Lantern is an independent modern chess engine
+                built for fast calculation, strong play and
+                competitive chess.
+
+                Designed around the Universal Chess Interface,
+                Lantern can run inside popular chess GUIs and
+                compete against humans or other engines.
+
+            </p>
+
+
+            <div class="hero-buttons">
+
+                <a
+                    href="#download"
+                    class="btn btn-primary"
+                >
+
+                    ↓ Download Lantern
+
+                </a>
+
+
+                <a
+                    href="https://github.com/Lantern-Chess"
+                    target="_blank"
+                    class="btn btn-secondary"
+                >
+
+                    View on GitHub ↗
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- LOGO -->
+
+        <div class="logo-stage">
+
+            <div class="logo-glow"></div>
+
+
+            <div class="big-logo">
+
+                <svg
+                    viewBox="0 0 200 200"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+
+                    <defs>
+
+                        <!-- MAIN GOLD -->
+
+                        <radialGradient
+                            id="lanternLight"
+                            cx="50%"
+                            cy="48%"
+                            r="60%"
+                        >
+
+                            <stop
+                                offset="0%"
+                                stop-color="#ffffff"
+                            />
+
+                            <stop
+                                offset="15%"
+                                stop-color="#fffbc5"
+                            />
+
+                            <stop
+                                offset="42%"
+                                stop-color="#ffe651"
+                            />
+
+                            <stop
+                                offset="72%"
+                                stop-color="#ffb300"
+                            />
+
+                            <stop
+                                offset="100%"
+                                stop-color="#ff8500"
+                            />
+
+                        </radialGradient>
+
+
+                        <!-- GLOW FILTER -->
+
+                        <filter
+                            id="lanternGlow"
+                            x="-50%"
+                            y="-50%"
+                            width="200%"
+                            height="200%"
+                        >
+
+                            <feGaussianBlur
+                                stdDeviation="8"
+                                result="blur"
+                            />
+
+                            <feMerge>
+
+                                <feMergeNode
+                                    in="blur"
+                                />
+
+                                <feMergeNode
+                                    in="SourceGraphic"
+                                />
+
+                            </feMerge>
+
+                        </filter>
+
+                    </defs>
+
+
+
+                    <!-- HANDLE -->
+
+                    <path
+                        d="
+                        M72 38
+                        C72 8
+                        128 8
+                        128 38"
+                        fill="none"
+                        stroke="#542700"
+                        stroke-width="11"
+                        stroke-linecap="round"
+                    />
+
+
+                    <!-- TOP -->
+
+                    <rect
+                        x="66"
+                        y="35"
+                        width="68"
+                        height="17"
+                        rx="7"
+                        fill="#5a2900"
+                    />
+
+
+                    <!-- OUTER BODY -->
+
+                    <path
+                        d="
+                        M59 59
+                        Q100 42 141 59
+
+                        L130 146
+
+                        Q100 163 70 146
+
+                        Z"
+                        fill="#d56a00"
+                        stroke="#572700"
+                        stroke-width="9"
+                    />
+
+
+                    <!-- LIGHT PANEL -->
+
+                    <path
+                        d="
+                        M72 66
+                        Q100 55 128 66
+
+                        L120 136
+
+                        Q100 147 80 136
+
+                        Z"
+                        fill="url(#lanternLight)"
+                        filter="url(#lanternGlow)"
+                    />
+
+
+                    <!-- INNER LIGHT -->
+
+                    <ellipse
+                        cx="100"
+                        cy="100"
+                        rx="25"
+                        ry="34"
+                        fill="#fff8af"
+                        opacity="0.72"
+                    />
+
+
+                    <!-- FRAME LEFT -->
+
+                    <path
+                        d="
+                        M70 62
+                        L80 141"
+                        stroke="#6a3100"
+                        stroke-width="8"
+                        stroke-linecap="round"
+                    />
+
+
+                    <!-- FRAME RIGHT -->
+
+                    <path
+                        d="
+                        M130 62
+                        L120 141"
+                        stroke="#6a3100"
+                        stroke-width="8"
+                        stroke-linecap="round"
+                    />
+
+
+                    <!-- BOTTOM -->
+
+                    <rect
+                        x="62"
+                        y="145"
+                        width="76"
+                        height="18"
+                        rx="7"
+                        fill="#542700"
+                    />
+
+
+                    <!-- FOOT -->
+
+                    <rect
+                        x="79"
+                        y="160"
+                        width="42"
+                        height="10"
+                        rx="5"
+                        fill="#783900"
+                    />
+
+                </svg>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     ENGINE STATS
+     ========================================================= -->
+
+<div class="stats">
+
+    <div class="container">
+
+        <div class="stats-card reveal">
+
+            <div class="stat">
+
+                <strong>UCI</strong>
+
+                <span>
+                    Protocol
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <strong>C++</strong>
+
+                <span>
+                    Engine
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <strong>x64</strong>
+
+                <span>
+                    Windows
+                </span>
+
+            </div>
+
+
+            <div class="stat">
+
+                <strong>Free</strong>
+
+                <span>
+                    Download
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     FEATURES
+     ========================================================= -->
+
+<section
+    class="features"
+    id="features"
+>
+
+    <div class="container">
+
+        <div class="section-header reveal">
+
+            <div class="section-tag">
+                The Engine
+            </div>
+
+            <h2>
+                Built to play serious chess.
+            </h2>
+
+            <p>
+
+                Lantern combines efficient search,
+                evaluation and modern engine techniques
+                in an independently developed chess engine.
+
+            </p>
+
+        </div>
+
+
+
+        <div class="feature-grid">
+
+
+            <div class="feature-card reveal">
+
+                <div class="feature-icon">
+                    ⚡
+                </div>
+
+                <h3>
+                    Fast Search
+                </h3>
+
+                <p>
+
+                    Efficient game-tree search allows
+                    Lantern to examine large numbers of
+                    positions while deciding on a move.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="feature-card reveal">
+
+                <div class="feature-icon">
+                    ♟
+                </div>
+
+                <h3>
+                    UCI Compatible
+                </h3>
+
+                <p>
+
+                    Lantern supports the Universal Chess
+                    Interface and can be installed in
+                    compatible chess GUIs.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="feature-card reveal">
+
+                <div class="feature-icon">
+                    🧠
+                </div>
+
+                <h3>
+                    Position Evaluation
+                </h3>
+
+                <p>
+
+                    Lantern evaluates chess positions
+                    to compare candidate moves and
+                    guide its search.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="feature-card reveal">
+
+                <div class="feature-icon">
+                    🏆
+                </div>
+
+                <h3>
+                    Engine Competition
+                </h3>
+
+                <p>
+
+                    Run Lantern against other UCI
+                    engines in tournaments,
+                    automated matches and testing.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="feature-card reveal">
+
+                <div class="feature-icon">
+                    💻
+                </div>
+
+                <h3>
+                    Lightweight
+                </h3>
+
+                <p>
+
+                    Lantern runs as a native chess
+                    engine without requiring a large
+                    application installation.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="feature-card reveal">
+
+                <div class="feature-icon">
+                    🔧
+                </div>
+
+                <h3>
+                    Actively Developed
+                </h3>
+
+                <p>
+
+                    Search, evaluation and performance
+                    can continue improving as new
+                    Lantern releases are developed.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     DOWNLOAD
+     ========================================================= -->
+
+<section id="download">
+
+    <div class="container">
+
+        <div class="download-box reveal">
+
+            <div class="download-content">
+
+
+                <div>
+
+                    <div class="download-tag">
+                        LATEST RELEASE
+                    </div>
+
+
+                    <h2>
+                        Download Lantern
+                    </h2>
+
+
+                    <p class="download-description">
+
+                        Download the latest Windows build
+                        of Lantern and add it to your
+                        favourite UCI-compatible chess GUI.
+
+                    </p>
+
+
+                    <div class="download-meta">
+
+                        <span>
+                            Windows x64
+                        </span>
+
+                        <span>
+                            UCI
+                        </span>
+
+                        <span>
+                            Chess Engine
+                        </span>
+
+                    </div>
+
+
+                    <!--
+                    CHANGE THIS LINK WHEN YOU CREATE
+                    THE LANTERN ENGINE REPOSITORY
+                    -->
+
+                    <a
+                        id="mainDownload"
+                        href="https://github.com/Lantern-Chess/Lantern/releases/latest"
+                        target="_blank"
+                        class="btn btn-primary big-download"
+                    >
+
+                        ↓ Download Latest Release
+
+                    </a>
+
+
+                    <a
+                        href="https://github.com/Lantern-Chess/Lantern/releases"
+                        target="_blank"
+                        class="btn btn-secondary"
+                        style="
+                            margin-left:8px;
+                            background:transparent;
+                            color:white;
+                            border-color:#5a4938;
+                        "
+                    >
+
+                        All Releases
+
+                    </a>
+
+                </div>
+
+
+
+                <div class="release-card">
+
+                    <h3>
+                        Lantern 1.0
+                    </h3>
+
+
+                    <div class="release-row">
+
+                        <span>
+                            Platform
+                        </span>
+
+                        <strong>
+                            Windows
+                        </strong>
+
+                    </div>
+
+
+                    <div class="release-row">
+
+                        <span>
+                            Architecture
+                        </span>
+
+                        <strong>
+                            x64
+                        </strong>
+
+                    </div>
+
+
+                    <div class="release-row">
+
+                        <span>
+                            Protocol
+                        </span>
+
+                        <strong>
+                            UCI
+                        </strong>
+
+                    </div>
+
+
+                    <div class="release-row">
+
+                        <span>
+                            Version
+                        </span>
+
+                        <strong>
+                            1.0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="release-row">
+
+                        <span>
+                            Cost
+                        </span>
+
+                        <strong>
+                            Free
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     INSTALLATION
+     ========================================================= -->
+
+<section id="install">
+
+    <div class="container">
+
+        <div class="section-header reveal">
+
+            <div class="section-tag">
+                Getting Started
+            </div>
+
+
+            <h2>
+                Playing with Lantern is easy.
+            </h2>
+
+
+            <p>
+
+                Lantern is a chess engine rather than
+                a complete graphical chess application,
+                so it is loaded into a chess GUI.
+
+            </p>
+
+        </div>
+
+
+        <div class="steps">
+
+
+            <div class="step reveal">
+
+                <div class="step-number">
+                    1
+                </div>
+
+                <h3>
+                    Download
+                </h3>
+
+                <p>
+
+                    Download the newest Lantern release
+                    from the official Releases page.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="step reveal">
+
+                <div class="step-number">
+                    2
+                </div>
+
+                <h3>
+                    Extract
+                </h3>
+
+                <p>
+
+                    Extract the downloaded ZIP file
+                    to a folder on your computer.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="step reveal">
+
+                <div class="step-number">
+                    3
+                </div>
+
+                <h3>
+                    Add Engine
+                </h3>
+
+                <p>
+
+                    Open a UCI-compatible chess GUI
+                    and select Lantern.exe as an engine.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="step reveal">
+
+                <div class="step-number">
+                    4
+                </div>
+
+                <h3>
+                    Play
+                </h3>
+
+                <p>
+
+                    Start a game, analyse a position,
+                    or let Lantern compete against
+                    another chess engine.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     ENGINE INFORMATION
+     ========================================================= -->
+
+<section
+    class="engine-info"
+    id="engine"
+>
+
+    <div class="container">
+
+        <div class="section-header reveal">
+
+            <div class="section-tag">
+                Information
+            </div>
+
+
+            <h2>
+                Engine specifications
+            </h2>
+
+        </div>
+
+
+        <div class="info-grid reveal">
+
+
+            <div class="info-row">
+
+                <span>
+                    Engine
+                </span>
+
+                <span>
+                    Lantern
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>
+                    Type
+                </span>
+
+                <span>
+                    Chess Engine
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>
+                    Protocol
+                </span>
+
+                <span>
+                    Universal Chess Interface (UCI)
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>
+                    Language
+                </span>
+
+                <span>
+                    C++
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>
+                    Architecture
+                </span>
+
+                <span>
+                    64-bit
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>
+                    Primary Platform
+                </span>
+
+                <span>
+                    Windows
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>
+                    Development
+                </span>
+
+                <span>
+                    Independent
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>
+                    Official GitHub
+                </span>
+
+                <span>
+                    Lantern-Chess
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     FAQ
+     ========================================================= -->
+
+<section id="faq">
+
+    <div class="container">
+
+        <div class="section-header reveal">
+
+            <div class="section-tag">
+                FAQ
+            </div>
+
+
+            <h2>
+                Frequently asked questions
+            </h2>
+
+        </div>
+
+
+        <div class="faq">
+
+
+            <div class="faq-item reveal">
+
+                <button class="faq-question">
+
+                    What is Lantern?
+
+                    <span class="faq-plus">
+                        +
+                    </span>
+
+                </button>
+
+
+                <div class="faq-answer">
+
+                    <p>
+
+                        Lantern is an independently developed
+                        chess engine designed to calculate
+                        and play chess positions.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="faq-item reveal">
+
+                <button class="faq-question">
+
+                    Does Lantern have its own chess board?
+
+                    <span class="faq-plus">
+                        +
+                    </span>
+
+                </button>
+
+
+                <div class="faq-answer">
+
+                    <p>
+
+                        Lantern is primarily an engine.
+                        You normally load it into a
+                        UCI-compatible chess GUI that
+                        provides the chess board.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="faq-item reveal">
+
+                <button class="faq-question">
+
+                    Is Lantern free?
+
+                    <span class="faq-plus">
+                        +
+                    </span>
+
+                </button>
+
+
+                <div class="faq-answer">
+
+                    <p>
+
+                        The downloadable releases listed
+                        on this website are provided
+                        according to the terms of the
+                        Lantern release.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="faq-item reveal">
+
+                <button class="faq-question">
+
+                    Where do I get new versions?
+
+                    <span class="faq-plus">
+                        +
+                    </span>
+
+                </button>
+
+
+                <div class="faq-answer">
+
+                    <p>
+
+                        New official versions of Lantern
+                        are published through the
+                        Lantern GitHub Releases page.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     FOOTER
+     ========================================================= -->
+
+<footer>
+
+    <div class="container">
+
+        <div class="footer-top">
+
+
+            <div class="footer-brand">
+
+                <div class="footer-title">
+
+                    <div class="mini-logo">
+
+                        <svg
+                            viewBox="0 0 100 100"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+
+                            <path
+                                d="M38 18 C38 7 62 7 62 18"
+                                fill="none"
+                                stroke="#502900"
+                                stroke-width="6"
+                                stroke-linecap="round"
+                            />
+
+
+                            <rect
+                                x="34"
+                                y="20"
+                                width="32"
+                                height="8"
+                                rx="3"
+                                fill="#5a2c00"
+                            />
+
+
+                            <path
+                                d="
+                                M30 32
+                                Q50 24 70 32
+                                L64 72
+                                Q50 80 36 72
+                                Z"
+                                fill="#ffd63d"
+                                stroke="#7b3b00"
+                                stroke-width="5"
+                            />
+
+
+                            <circle
+                                cx="50"
+                                cy="52"
+                                r="14"
+                                fill="#fff8bd"
+                            />
+
+
+                            <rect
+                                x="30"
+                                y="73"
+                                width="40"
+                                height="9"
+                                rx="4"
+                                fill="#562900"
+                            />
+
+                        </svg>
+
+                    </div>
+
+                    Lantern
+
+                </div>
+
+
+                <p>
+
+                    An independent modern chess engine.
+                    Illuminate the board.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="footer-links">
+
+                <a href="#home">
+                    Home
+                </a>
+
+                <a href="#features">
+                    Features
+                </a>
+
+                <a href="#download">
+                    Download
+                </a>
+
+                <a href="#install">
+                    Install
+                </a>
+
+                <a
+                    href="https://github.com/Lantern-Chess"
+                    target="_blank"
+                >
+                    GitHub
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="copyright">
+
+            © <span id="year"></span>
+            Lantern Chess Engine.
+            All rights reserved.
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+     ========================================================= -->
+
+<script>
+
+    /* MOBILE NAVIGATION */
+
+    const mobileMenu =
+        document.getElementById("mobileMenu");
+
+    const navLinks =
+        document.getElementById("navLinks");
+
+
+    mobileMenu.addEventListener(
+        "click",
+        () => {
+
+            navLinks.classList.toggle(
+                "open"
+            );
+
+        }
+    );
+
+
+    document.querySelectorAll(
+        ".nav-links a"
+    ).forEach(link => {
+
+        link.addEventListener(
+            "click",
+            () => {
+
+                navLinks.classList.remove(
+                    "open"
+                );
+
+            }
+        );
+
+    });
+
+
+
+    /* FAQ */
+
+    document.querySelectorAll(
+        ".faq-question"
+    ).forEach(question => {
+
+        question.addEventListener(
+            "click",
+            () => {
+
+                const item =
+                    question.parentElement;
+
+                item.classList.toggle(
+                    "open"
+                );
+
+            }
+        );
+
+    });
+
+
+
+    /* SCROLL REVEAL */
+
+    const revealElements =
+        document.querySelectorAll(
+            ".reveal"
+        );
+
+
+    const observer =
+        new IntersectionObserver(
+
+            entries => {
+
+                entries.forEach(
+                    entry => {
+
+                        if (
+                            entry.isIntersecting
+                        ) {
+
+                            entry.target
+                                .classList
+                                .add("visible");
+
+                        }
+
+                    }
+                );
+
+            },
+
+            {
+                threshold: 0.12
+            }
+
+        );
+
+
+    revealElements.forEach(
+        element => {
+
+            observer.observe(
+                element
+            );
+
+        }
+    );
+
+
+
+    /* COPYRIGHT YEAR */
+
+    document.getElementById(
+        "year"
+    ).textContent =
+        new Date().getFullYear();
+
+</script>
+
 
 </body>
 </html>
