@@ -1410,6 +1410,44 @@
 
     }
 
+
+/* Release archive and online analyzer */
+.releases-section{padding-top:75px;background:linear-gradient(180deg,#fffdf9,#fff4e7)}
+.release-toolbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:24px}
+.release-toolbar label{font-weight:700;color:#60452c}
+.release-toolbar input{flex:1;min-width:210px;padding:14px 16px;border:1px solid #e5d0b8;border-radius:12px;background:#fff;font:inherit;color:#2b2118;outline-color:#dd8200}
+.release-toolbar span{color:var(--muted);font-size:13px}
+.release-toolbar button{background:#fff;border:1px solid #e5d0b8;border-radius:10px;padding:12px 16px;cursor:pointer;font-weight:700}
+.release-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.archive-card{background:#fff;border:1px solid #e9d9c7;border-radius:18px;padding:24px;box-shadow:0 12px 32px rgba(88,53,10,.05);display:flex;flex-direction:column;gap:12px;min-width:0}
+.archive-card:hover{border-color:#f1ad50;transform:translateY(-3px);transition:.2s}
+.archive-card h3{font-size:22px;line-height:1.2;overflow-wrap:anywhere;color:#24180e}
+.archive-card p{font-size:14px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere}
+.archive-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.archive-badge{font-size:11px;border-radius:30px;padding:5px 10px;background:#fff0d9;color:#995100;font-weight:800}
+.archive-badge.beta{background:#ece8ff;color:#5a4c91}
+.archive-date{font-size:12px;color:#867563}
+.archive-assets{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.archive-assets a{display:inline-block;padding:9px 12px;border-radius:9px;background:#fff0dc;color:#8b4b00;font-weight:700;font-size:12px;overflow-wrap:anywhere}
+.archive-assets a:hover{background:#ffdfa9}
+.archive-assets a.primary-asset{background:#ed8807;color:#fff}
+.archive-empty{grid-column:1/-1;padding:42px 24px;background:white;border:1px dashed #e4c7a7;border-radius:18px;text-align:center;color:#80674d}
+.release-more{text-align:center;margin-top:24px}
+.release-disclaimer{margin-top:19px;font-size:13px;color:var(--muted);text-align:center}
+.release-disclaimer a{color:#a25d07;text-decoration:underline}
+.release-status{font-size:13px;color:#efd3aa;margin-bottom:14px}
+.analyze-section{padding-top:65px}
+.analyze-banner{background:linear-gradient(125deg,#21170f,#43301b);color:white;padding:clamp(30px,6vw,65px);border-radius:27px;display:grid;grid-template-columns:1.3fr .7fr;align-items:center;gap:36px;overflow:hidden;box-shadow:0 24px 55px rgba(45,27,8,.16)}
+.analyze-copy h2{font-size:clamp(32px,4vw,49px);line-height:1.1;max-width:580px;margin:10px 0 20px}
+.analyze-copy p{color:#e0cbb1;max-width:560px;margin-bottom:25px}
+.analyze-actions{display:flex;gap:12px;flex-wrap:wrap}
+.chess-decoration{display:grid;grid-template-columns:repeat(4,1fr);aspect-ratio:1;border:8px solid #936132;border-radius:9px;transform:rotate(-7deg);box-shadow:0 15px 45px #120b06}
+.chess-decoration span{display:grid;place-items:center;font-size:clamp(26px,4vw,55px);background:#f4d8aa;color:#3a2310}
+.chess-decoration span:nth-child(8n+2),.chess-decoration span:nth-child(8n+4),.chess-decoration span:nth-child(8n+5),.chess-decoration span:nth-child(8n+7){background:#985f36;color:#fff0dc}
+@media(max-width:900px){.release-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.analyze-banner{grid-template-columns:1fr}.chess-decoration{max-width:250px;margin:auto}}
+@media(max-width:620px){.release-grid{grid-template-columns:1fr}.hero h1{font-size:clamp(54px,14vw,90px)}.release-toolbar label{width:100%}.release-toolbar input{width:100%}.analyze-banner{padding:28px}.chess-decoration{display:none}}
+@media(prefers-reduced-motion:reduce){.archive-card:hover{transform:none}}
+
 </style>
 </head>
 
@@ -1550,13 +1588,13 @@
                 Engine
             </a>
 
-            <a href="#faq">
-                FAQ
-            </a>
+            <a href="#releases">Releases</a>
+            <a href="https://tinyurl.com/LanternChessWeb" target="_blank" rel="noopener noreferrer">Analyze Online ↗</a>
+            <a href="#faq">FAQ</a>
 
             <a
-                href="https://github.com/Lantern-Chess"
-                target="_blank"
+                href="https://github.com/Lantern-Chess/Lantern"
+                target="_blank" rel="noopener noreferrer"
             >
                 GitHub
             </a>
@@ -1639,14 +1677,16 @@
 
 
                 <a
-                    href="https://github.com/Lantern-Chess"
-                    target="_blank"
+                    href="https://github.com/Lantern-Chess/Lantern"
+                    target="_blank" rel="noopener noreferrer"
                     class="btn btn-secondary"
                 >
 
                     View on GitHub ↗
 
                 </a>
+
+                <a href="https://tinyurl.com/LanternChessWeb" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">♞ Play &amp; Analyze Online ↗</a>
 
             </div>
 
@@ -2160,14 +2200,11 @@
                     </div>
 
 
-                    <!--
-                    CHANGE THIS LINK WHEN YOU CREATE
-                    THE LANTERN ENGINE REPOSITORY
-                    -->
+
 
                     <a
                         id="mainDownload"
-                        href="https://github.com/Lantern-Chess/lantern-chess.github.io/releases/download/v13.1/Lantern13.1.zip"
+                        href="https://github.com/Lantern-Chess/Lantern/releases"
                         class="btn btn-primary big-download"
                     >
 
@@ -2178,7 +2215,7 @@
 
                     <a
                         href="https://github.com/Lantern-Chess/Lantern/releases"
-                        target="_blank"
+                        target="_blank" rel="noopener noreferrer"
                         class="btn btn-secondary"
                         style="
                             margin-left:8px;
@@ -2198,9 +2235,8 @@
 
                 <div class="release-card">
 
-                    <h3>
-                        Lantern 13.1
-                    </h3>
+                    <h3><span id="latestReleaseTitle">Checking GitHub…</span></h3>
+                    <p id="releaseStatus" class="release-status" role="status" aria-live="polite">Connecting to GitHub Releases…</p>
 
 
                     <div class="release-row">
@@ -2249,7 +2285,7 @@
                         </span>
 
                         <strong>
-                            13.1
+                            <span id="latestVersion">—</span>
                         </strong>
 
                     </div>
@@ -2279,6 +2315,20 @@
 </section>
 
 
+
+<section id="releases" class="releases-section">
+ <div class="container">
+  <div class="section-header reveal"><div class="section-tag">Version archive</div><h2>Every release. One place.</h2><p>Live releases from GitHub, with direct download links for every available asset. Updated whenever you visit.</p></div>
+  <div class="release-toolbar"><label for="releaseSearch">Find a release</label><input id="releaseSearch" type="search" placeholder="Search version, notes or filename…" aria-label="Search releases"><span id="releaseCount" aria-live="polite">Loading releases…</span><button id="refreshReleases" type="button">↻ Refresh</button></div>
+  <div id="releaseGrid" class="release-grid" aria-live="polite"><div class="archive-empty">Loading the latest releases from GitHub…</div></div>
+  <div id="releaseMore" class="release-more" hidden><button type="button" id="showMoreReleases" class="btn btn-secondary">Show more releases</button></div>
+  <p class="release-disclaimer">Releases are loaded from the public GitHub API. If GitHub is unavailable or rate-limited, you can still <a href="https://github.com/Lantern-Chess/Lantern/releases" target="_blank" rel="noopener noreferrer">browse on GitHub</a>.</p>
+ </div>
+</section>
+
+<section id="analyze" class="analyze-section">
+ <div class="container"><div class="analyze-banner reveal"><div class="analyze-copy"><div class="section-tag">The online chessboard</div><h2>Your games deserve a deeper look.</h2><p>Open Lantern Chess Web to play, inspect positions, explore moves and analyze games without installing a desktop chess GUI.</p><div class="analyze-actions"><a class="btn btn-primary" href="https://tinyurl.com/LanternChessWeb" target="_blank" rel="noopener noreferrer">♟ Open Game Analyzer ↗</a><a class="btn btn-secondary" href="#releases">Explore engine releases</a></div></div><div class="chess-decoration" aria-hidden="true"><span>♜</span><span>♞</span><span>♝</span><span>♛</span><span>♚</span><span>♟</span><span>♙</span><span>♘</span><span>♗</span><span>♕</span><span>♔</span><span>♖</span><span>♟</span><span>♙</span><span>♞</span><span>♘</span></div></div></div>
+</section>
 
 <!-- =========================================================
      INSTALLATION
@@ -2801,13 +2851,13 @@
                     Download
                 </a>
 
-                <a href="#install">
-                    Install
-                </a>
+                <a href="#install">Install</a>
+                <a href="#releases">Releases</a>
+                <a href="https://tinyurl.com/LanternChessWeb" target="_blank" rel="noopener noreferrer">Analyze Online</a>
 
                 <a
-                    href="https://github.com/Lantern-Chess"
-                    target="_blank"
+                    href="https://github.com/Lantern-Chess/Lantern"
+                    target="_blank" rel="noopener noreferrer"
                 >
                     GitHub
                 </a>
@@ -2957,6 +3007,85 @@
         "year"
     ).textContent =
         new Date().getFullYear();
+
+
+// GitHub Releases API: public, no token or build step needed.
+// Try the official engine repository first, then the GitHub Pages repository
+// (older Lantern builds were linked from there). Never mix unrelated projects.
+const RELEASE_REPOSITORIES = ["Lantern-Chess/Lantern", "Lantern-Chess/lantern-chess.github.io"];
+const releaseGrid = document.getElementById("releaseGrid");
+const releaseCount = document.getElementById("releaseCount");
+const releaseSearch = document.getElementById("releaseSearch");
+const showMore = document.getElementById("showMoreReleases");
+const moreWrap = document.getElementById("releaseMore");
+let allReleases = [], visibleLimit = 9, activeRepo = RELEASE_REPOSITORIES[0];
+const readableDate = value => value ? new Date(value).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}) : "Unknown date";
+const textElement = (tag, text, className) => { const el=document.createElement(tag); if(className)el.className=className;el.textContent=text;return el; };
+function makeAssetLink(asset, primary=false) {
+ const a=document.createElement("a");a.href=asset.browser_download_url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=asset.name;a.title="Download " + asset.name;if(primary)a.className="primary-asset";return a;
+}
+function renderReleases() {
+ const term=releaseSearch.value.trim().toLowerCase();
+ const filtered=allReleases.filter(r=>[r.name,r.tag_name,r.body,...(r.assets||[]).map(a=>a.name)].join(" ").toLowerCase().includes(term));
+ const shown=filtered.slice(0,visibleLimit);releaseGrid.replaceChildren();
+ releaseCount.textContent=`${filtered.length} of ${allReleases.length} release${allReleases.length===1?"":"s"}`;
+ if(!shown.length){releaseGrid.append(textElement("div",allReleases.length?"No releases match that search.":"No published GitHub releases were found.","archive-empty"));}
+ shown.forEach((r,i)=>{
+   const card=document.createElement("article");card.className="archive-card";
+   const top=document.createElement("div");top.className="archive-top";
+   top.append(textElement("span",i===0&&!term?"LATEST":r.prerelease?"PRE-RELEASE":"RELEASE","archive-badge"+(r.prerelease?" beta":"")),textElement("span",readableDate(r.published_at),"archive-date"));card.append(top);
+   card.append(textElement("h3",r.name||r.tag_name),textElement("p",r.tag_name));
+   if(r.body)card.append(textElement("p",r.body.replace(/[#*_`>\[\]]/g," ").replace(/\s+/g," ").trim().slice(0,230)+(r.body.length>230?"…":"")));
+   const links=document.createElement("div");links.className="archive-assets";
+   (r.assets||[]).forEach((asset,j)=>links.append(makeAssetLink(asset,j===0)));
+   const details=document.createElement("a");details.href=r.html_url;details.target="_blank";details.rel="noopener noreferrer";details.textContent="Release notes ↗";links.append(details);card.append(links);releaseGrid.append(card);
+ });
+ moreWrap.hidden=filtered.length<=visibleLimit;
+}
+async function getRepoReleases(repo){
+ const gathered=[];
+ for(let page=1;page<=20;page++){
+  const url=`https://api.github.com/repos/${repo}/releases?per_page=100&page=${page}`;
+  const response=await fetch(url,{headers:{Accept:"application/vnd.github+json"},cache:"no-store"});
+  if(!response.ok)throw new Error(`GitHub API HTTP ${response.status}`);
+  const batch=await response.json();if(!Array.isArray(batch))throw new Error("Unexpected API response");
+  gathered.push(...batch.filter(r=>!r.draft));if(batch.length<100)break;
+ }
+ return gathered.sort((a,b)=>new Date(b.published_at||b.created_at)-new Date(a.published_at||a.created_at));
+}
+async function loadReleases(){
+ const refresh=document.getElementById("refreshReleases");refresh.disabled=true;
+ releaseCount.textContent="Checking GitHub…";
+ releaseGrid.replaceChildren(textElement("div","Loading published releases from GitHub…","archive-empty"));
+ let error=null;
+ try{
+  let result=[];
+  for(const repo of RELEASE_REPOSITORIES){try{const found=await getRepoReleases(repo);if(found.length){result=found;activeRepo=repo;break;}}catch(e){error=e;}}
+  allReleases=result;visibleLimit=9;renderReleases();
+  const latest=allReleases.find(r=>!r.prerelease)||allReleases[0];
+  const download=document.getElementById("mainDownload");
+  if(latest){
+    document.getElementById("latestReleaseTitle").textContent=latest.name||latest.tag_name;
+    document.getElementById("latestVersion").textContent=latest.tag_name;
+    document.getElementById("releaseStatus").textContent=`Published ${readableDate(latest.published_at)} · Live from GitHub`;
+    const assets=latest.assets||[];
+    const recommended=assets.find(a=>/\.(zip|7z|exe|msi)$/i.test(a.name))||assets[0];
+    download.href=recommended?recommended.browser_download_url:latest.html_url;
+    download.textContent=recommended?"↓ Download Latest Build":"View Latest Release ↗";
+  }else{
+    document.getElementById("latestReleaseTitle").textContent="GitHub releases";
+    document.getElementById("latestVersion").textContent="See GitHub";
+    document.getElementById("releaseStatus").textContent=error?"GitHub API unavailable; use the Releases page.":"No published releases found yet.";
+    download.href=`https://github.com/${RELEASE_REPOSITORIES[0]}/releases`;
+    download.textContent="Browse GitHub Releases ↗";
+    if(error)releaseGrid.replaceChildren(textElement("div",`Unable to load releases (${error.message}). Open GitHub Releases instead.`,"archive-empty"));
+  }
+ }finally{refresh.disabled=false;}
+}
+releaseSearch.addEventListener("input",()=>{visibleLimit=9;renderReleases();});
+showMore.addEventListener("click",()=>{visibleLimit+=9;renderReleases();});
+document.getElementById("refreshReleases").addEventListener("click",loadReleases);
+loadReleases().catch(e=>{releaseGrid.replaceChildren(textElement("div","GitHub release lookup failed: "+e.message,"archive-empty"));document.getElementById("refreshReleases").disabled=false;});
 
 </script>
 
